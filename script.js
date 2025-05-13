@@ -480,14 +480,11 @@ document.addEventListener("DOMContentLoaded", () => {
         // Set the rating value in the form before submission (hidden field)
         document.getElementById("rating-value").value = ratingValue;
     
-        // Create a FormData object to capture all form fields
-        const formData = new FormData(feedbackForm);
-    
-        // Send the form data via EmailJS
+        // Send the form via EmailJS
         emailjs.sendForm(
           'service_3mqfc8a',       // Replace with your EmailJS Service ID
           'template_pjymkk7',      // Replace with your EmailJS Template ID
-          formData,
+          this,
           'Iuyd3EslKWKQw5msh'      // Your Public Key
         ).then(
           function () {
@@ -510,7 +507,24 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
     
-    
+    document.getElementById('feedback-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+  
+      // Show thank you modal
+      document.getElementById('thank-you-modal').style.display = 'block';
+  
+      // Capture form data
+      var formData = new FormData(event.target);
+  
+      // Send email using EmailJS
+      emailjs.sendForm('service_3mqfc8a', 'template_pjymkk7', formData, 'Iuyd3EslKWKQw5msh')
+          .then(function(response) {
+              console.log('SUCCESS!', response); // Success log
+          }, function(error) {
+              console.log('FAILED...', error); // Failure log
+          });
+  });
+  
     
     // Capture star clicks and update the rating value
     const stars = document.querySelectorAll('.stars i');
