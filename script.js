@@ -168,10 +168,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Star Rating System
-    const stars = document.querySelectorAll('.stars i');
+    const starElements = document.querySelectorAll('.stars i');
     const ratingValue = document.getElementById('rating-value');
     
-    stars.forEach(star => {
+    starElements.forEach(star => {
         star.addEventListener('click', function() {
             const value = this.getAttribute('data-rating');
             ratingValue.value = value;
@@ -412,16 +412,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const testimonialInterval = setInterval(nextTestimonial, 6000)
   
     // Star Rating System
-    const stars = document.querySelectorAll(".stars i")
+    const starElements = document.querySelectorAll(".stars i")
     const ratingValue = document.getElementById("rating-value")
   
-    stars.forEach((star) => {
+    starElements.forEach((star) => {
       star.addEventListener("click", function () {
         const value = this.getAttribute("data-rating")
         ratingValue.value = value
   
         // Update stars display
-        stars.forEach((s) => {
+        starElements.forEach((s) => {
           if (s.getAttribute("data-rating") <= value) {
             s.classList.remove("far")
             s.classList.add("fas")
@@ -469,96 +469,99 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   
     // Form Submission with WhatsApp Integration
-    const feedbackForm = document.getElementById("feedback-form")
-  
+    const feedbackForm = document.getElementById("feedback-form");
     if (feedbackForm) {
-      feedbackForm.addEventListener("submit", (e) => {
-        e.preventDefault()
-  
-        // Get form values
-        const name = document.getElementById("name").value
-        const email = document.getElementById("email").value
-        const feedbackType = document.getElementById("feedback-type").value
-        const message = document.getElementById("feedback-message").value
-        const rating = ratingValue.value
-  
-        // Format the message for WhatsApp
-        const whatsappNumber = "9030209797" // The target WhatsApp number
-        const whatsappMessage = `
-  *Feedback from Brightwood Academy Website*
-  Name: ${name}
-  Email: ${email}
-  Feedback Type: ${feedbackType}
-  Rating: ${rating}/5
-  Message: ${message}
-  `
-  
-        // Encode the message for URL
-        const encodedMessage = encodeURIComponent(whatsappMessage)
-  
-        // Create WhatsApp URL
-        const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`
-  
-        // Redirect to WhatsApp
-        window.open(whatsappUrl, "_blank")
-  
-        // Reset form
-        feedbackForm.reset()
-  
-        // Reset star rating
-        stars.forEach((s) => {
-          s.classList.remove("fas")
-          s.classList.add("far")
-        })
-        ratingValue.value = "0"
-  
-        // Show success message
-        alert("Thank you for your feedback! You will be redirected to WhatsApp to send your message.")
-      })
+      feedbackForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+    
+        // Get rating value
+        const ratingValue = document.getElementById("rating-value").value;
+    
+        // Set the rating value in the form before submission (hidden field)
+        document.getElementById("rating-value").value = ratingValue;
+    
+        // Create a FormData object to capture all form fields
+        const formData = new FormData(feedbackForm);
+    
+        // Send the form data via EmailJS
+        emailjs.sendForm(
+          'service_3mqfc8a',       // Replace with your EmailJS Service ID
+          'template_pjymkk7',      // Replace with your EmailJS Template ID
+          formData,
+          'Iuyd3EslKWKQw5msh'      // Your Public Key
+        ).then(
+          function () {
+            alert('Thank you for your feedback!');
+            feedbackForm.reset();
+    
+            // Reset star rating
+            const stars = document.querySelectorAll('.stars i');
+            stars.forEach(s => {
+              s.classList.remove('fas');
+              s.classList.add('far');
+            });
+            document.getElementById('rating-value').value = "0";
+          },
+          function (error) {
+            console.error('FAILED...', error);
+            alert('Failed to send feedback. Please try again later.');
+          }
+        );
+      });
     }
+    
+    
+    
+    // Capture star clicks and update the rating value
+    const stars = document.querySelectorAll('.stars i');
+    stars.forEach(star => {
+      star.addEventListener('click', function () {
+        const rating = this.getAttribute('data-rating');
+        const ratingValue = document.getElementById('rating-value');
+        ratingValue.value = rating;
+    
+        // Update the star icons to show the selected rating
+        stars.forEach(s => {
+          if (s.getAttribute('data-rating') <= rating) {
+            s.classList.remove('far');
+            s.classList.add('fas');
+          } else {
+            s.classList.remove('fas');
+            s.classList.add('far');
+          }
+        });
+      });
+    });
+    
+
   })
   
-  document.getElementById("feedback-form").addEventListener("submit", function (e) {
-    e.preventDefault();
 
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const type = document.getElementById("feedback-type").value;
-    const message = document.getElementById("feedback-message").value.trim();
-    const rating = document.getElementById("rating-value").value;
-
-    const whatsappMessage = `Feedback from ${name} (${email})%0AType: ${type}%0ARating: ${rating}/5%0AMessage: ${message}`;
-
-    // Open WhatsApp chat with pre-filled message
-    const whatsappURL = `https://wa.me/919030209797?text=${whatsappMessage}`;
-
-    window.open(whatsappURL, "_blank");
-  });
 
   // If you want to dynamically create the message link after form submission
-  document.getElementById("contact-form").addEventListener("submit", function(event) {
-    event.preventDefault();
-
-    // Get form values
-    const name = document.getElementById("contact-name").value;
-    const email = document.getElementById("contact-email").value;
-    const phone = document.getElementById("contact-phone").value;
-    const inquiry = document.getElementById("inquiry-type").value;
-    const message = document.getElementById("contact-message").value;
-
-    // Pre-fill WhatsApp message
-    const whatsappMessage = `Name: ${name}%0AEmail: ${email}%0APhone: ${phone}%0AInquiry Type: ${inquiry}%0AMessage: ${message}`;
-
-    // Create WhatsApp link
-    const whatsappLink = `https://wa.me/9198019992444?text=${whatsappMessage}`;
-
-    // Set the href attribute of the WhatsApp link dynamically
-    document.getElementById("whatsapp-link").setAttribute("href", whatsappLink);
-
-    // Redirect to WhatsApp (optional)
-    window.open(whatsappLink, "_blank");
-});
-
+  const contactForm = document.getElementById('contact-form');
+  if (contactForm) {
+      contactForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+  
+          emailjs.sendForm(
+              'service_3mqfc8a',     // 🔁 Replace with your EmailJS Service ID
+              'template_upp2hyw',    // 🔁 Replace with your EmailJS Template ID
+              this,
+              'Iuyd3EslKWKQw5msh'      // 🔁 Replace with your EmailJS Public Key
+          ).then(
+              function () {
+                  alert('Message sent successfully!');
+                  contactForm.reset();
+              },
+              function (error) {
+                  console.error('FAILED...', error);
+                  alert('Failed to send message. Try again.');
+              }
+          );
+      });
+  }
+  
 
 var modal = document.getElementById("thank-you-modal");
 var closeBtn = document.getElementById("close-modal");
