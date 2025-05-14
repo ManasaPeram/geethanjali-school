@@ -194,7 +194,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (feedbackForm) {
         feedbackForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('Thank you for your feedback! We appreciate your input.');
             this.reset();
             // Reset star rating
             stars.forEach(s => {
@@ -219,7 +218,7 @@ document.addEventListener('DOMContentLoaded', function() {
 if (newsletterForm) {
     newsletterForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        alert('Thank you for subscribing to our YouTube channel!');
+        // alert('Thank you for subscribing to our YouTube channel!');
         // After alert, open YouTube channel in a new tab
         window.open('https://youtu.be/ffnw65zray8?si=7Vq2bZprK4yxhwY', '_blank');
         this.reset();
@@ -470,83 +469,42 @@ document.addEventListener("DOMContentLoaded", () => {
   
     // Form Submission with WhatsApp Integration
     const feedbackForm = document.getElementById("feedback-form");
+
     if (feedbackForm) {
       feedbackForm.addEventListener("submit", function (e) {
         e.preventDefault();
     
-        // Get rating value
+        // Get form values
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const feedbackMessage = document.getElementById("feedback-message").value;
+        const feedbackType = document.getElementById("feedback-type").value;
         const ratingValue = document.getElementById("rating-value").value;
     
-        // Set the rating value in the form before submission (hidden field)
-        document.getElementById("rating-value").value = ratingValue;
-    
-        // Send the form via EmailJS
-        emailjs.sendForm(
-          'service_3mqfc8a',       // Replace with your EmailJS Service ID
-          'template_pjymkk7',      // Replace with your EmailJS Template ID
-          this,
-          'Iuyd3EslKWKQw5msh'      // Your Public Key
-        ).then(
-          function () {
-            alert('Thank you for your feedback!');
-            feedbackForm.reset();
-    
-            // Reset star rating
-            const stars = document.querySelectorAll('.stars i');
-            stars.forEach(s => {
-              s.classList.remove('fas');
-              s.classList.add('far');
-            });
-            document.getElementById('rating-value').value = "0";
-          },
-          function (error) {
-            console.error('FAILED...', error);
-            alert('Failed to send feedback. Please try again later.');
-          }
-        );
+        // Create formatted WhatsApp message
+        const whatsappMessage = `*Feedback Details*%0A%0A*Name:* ${name}%0A*Email:* ${email}%0A*Feedback Type:* ${feedbackType}%0A*Rating:* ${ratingValue}/5%0A*Message:* ${feedbackMessage}`;
+        
+        // Create WhatsApp link with your number
+        const whatsappLink = `https://wa.me/919030209797?text=${whatsappMessage}`;
+        
+        // Reset form
+        feedbackForm.reset();
+        
+        // Reset star rating
+        const stars = document.querySelectorAll('.stars i');
+        stars.forEach(s => {
+          s.classList.remove('fas');
+          s.classList.add('far');
+        });
+        document.getElementById('rating-value').value = "0";
+        
+        // Redirect to WhatsApp
+        window.open(whatsappLink, '_blank');
       });
     }
-    
-    document.getElementById('feedback-form').addEventListener('submit', function(event) {
-      event.preventDefault();
-  
-      // Show thank you modal
-      document.getElementById('thank-you-modal').style.display = 'block';
-  
-      // Capture form data
-      var formData = new FormData(event.target);
-  
-      // Send email using EmailJS
-      emailjs.sendForm('service_3mqfc8a', 'template_pjymkk7', formData, 'Iuyd3EslKWKQw5msh')
-          .then(function(response) {
-              console.log('SUCCESS!', response); // Success log
-          }, function(error) {
-              console.log('FAILED...', error); // Failure log
-          });
-  });
   
     
-    // Capture star clicks and update the rating value
-    const stars = document.querySelectorAll('.stars i');
-    stars.forEach(star => {
-      star.addEventListener('click', function () {
-        const rating = this.getAttribute('data-rating');
-        const ratingValue = document.getElementById('rating-value');
-        ratingValue.value = rating;
-    
-        // Update the star icons to show the selected rating
-        stars.forEach(s => {
-          if (s.getAttribute('data-rating') <= rating) {
-            s.classList.remove('far');
-            s.classList.add('fas');
-          } else {
-            s.classList.remove('fas');
-            s.classList.add('far');
-          }
-        });
-      });
-    });
-    
+  
 
   })
   
@@ -559,18 +517,39 @@ document.addEventListener("DOMContentLoaded", () => {
           e.preventDefault();
   
           emailjs.sendForm(
-              'service_3mqfc8a',     // 🔁 Replace with your EmailJS Service ID
+              'service_tdypd7z',     // 🔁 Replace with your EmailJS Service ID
               'template_upp2hyw',    // 🔁 Replace with your EmailJS Template ID
               this,
               'Iuyd3EslKWKQw5msh'      // 🔁 Replace with your EmailJS Public Key
           ).then(
               function () {
-                  alert('Message sent successfully!');
+                  // Show a success popup
+                  const successPopup = document.createElement('div');
+                  successPopup.className = 'success-popup';
+                  successPopup.textContent = 'Message sent successfully!';
+                  document.body.appendChild(successPopup);
+
+                  // Style the popup
+                  successPopup.style.position = 'fixed';
+                  successPopup.style.top = '50%';
+                  successPopup.style.left = '50%';
+                  successPopup.style.transform = 'translate(-50%, -50%)';
+                  successPopup.style.backgroundColor = '#4caf50';
+                  successPopup.style.color = '#fff';
+                  successPopup.style.padding = '20px';
+                  successPopup.style.borderRadius = '5px';
+                  successPopup.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+                  successPopup.style.zIndex = '1000';
+
+                  // Remove the popup after 3 seconds
+                  setTimeout(() => {
+                      successPopup.remove();
+                  }, 3000);
                   contactForm.reset();
               },
               function (error) {
                   console.error('FAILED...', error);
-                  alert('Failed to send message. Try again.');
+                //   alert('Failed to send message. Try again.');
               }
           );
       });
@@ -619,4 +598,50 @@ window.onclick = function(event) {
     if (event.target === modal) {
         modal.style.display = "none";
     }
+}
+
+// Initialize star rating system
+const starsContainer = document.querySelector('.stars');
+if (starsContainer) {
+  // Create 5 stars
+  for (let i = 1; i <= 5; i++) {
+    const star = document.createElement('i');
+    star.classList.add('far', 'fa-star');
+    star.setAttribute('data-rating', i);
+    starsContainer.appendChild(star);
+  }
+}
+
+// Feedback Form Submission with WhatsApp Integration
+const feedbackForm = document.getElementById("feedback-form");
+
+if (feedbackForm) {
+  feedbackForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    // Get form values
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const feedbackType = document.getElementById("feedback-type").value;
+    const message = document.getElementById("feedback-message").value;
+    const rating = document.getElementById("rating-value").value;
+
+    // Create formatted WhatsApp message with line breaks and formatting
+    const whatsappMessage = `*--Feedback Details--*%0A%0A*Name:* ${name}%0A*Email:* ${email}%0A*Feedback Type:* ${feedbackType}%0A*Rating:* ${rating}/5 Stars%0A*Message:* ${message}`;
+
+    // Create WhatsApp link with your number
+    const whatsappLink = `https://wa.me/919030209797?text=${whatsappMessage}`;
+
+    // Reset form and star rating
+    feedbackForm.reset();
+    const stars = document.querySelectorAll('.stars i');
+    stars.forEach(s => {
+      s.classList.remove('fas');
+      s.classList.add('far');
+    });
+    document.getElementById('rating-value').value = "0";
+
+    // Open WhatsApp in new tab
+    window.open(whatsappLink, '_blank');
+  });
 }
